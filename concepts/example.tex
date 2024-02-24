@@ -3,6 +3,38 @@
 \author{Authorman}
 \date{today}
 \begin{document}
-    \maketitle 
-    Example text.
+
+\ExplSyntaxOn
+
+
+
+% Functions:
+
+% register_item(name)
+% if (is_name_defined(name)) then
+%     raise warning
+% else
+%     add name to name_set
+%     write_label(name)
+% end if
+
+% ref_item(name)
+% if (not is_name_defined(name)) then
+%     raise warning("referenced name not defined")
+% else
+%     ref_label(name)
+% end if
+
+% link_item(name1)(name2)
+% if (not (is_name_defined(name1)
+%         or is_name_defined(name2))) then
+%     raise warning("referenced names not defined")
+% else
+%     add to list (get_target_list_of(name1))
+% end if
+
+% get_target_list_of(name1)
+%...
+
+\ExplSyntaxOff
 \end{document}
