@@ -1,13 +1,123 @@
 \documentclass{article}
+\usepackage{hyperref}
+\usepackage{color}
+
 \title{Test}
 \author{Authorman}
 \date{today}
 \begin{document}
 
+% 
+
+
+
+
+
+
+
 \ExplSyntaxOn
+%define \my_concat:nn
+
+\newcommand{\tracerman_error}[1]{\textcolor{red}{[TRACERMAN~ERROR:~#1]}}
+
+\makeatletter
+    \newcommand\is_label_defined[1]{
+        \@ifundefined{r@#1}{no}{yes}
+    }
+\makeatother
 
 
 
+\cs_set:Npn \tracerman_write_label:n #1 {
+    #1\label{#1}
+}
+
+\cs_set:Npn \tracerman_ref_label:n #1 {
+    \hyperref[#1]{#1}
+}
+
+% \bool_if:NTF \l_tmpa_bool {WHAT} {
+%       WHAT
+% }
+
+
+%use \my_concat:nn
+
+
+
+% reference
+% \tracerman_write_label:n {a} %result: a, b
+% \tracerman_ref_label:n {a} %result: a, b
+
+
+
+% \tracerman_label_if{what}{true}{false}
+
+% the command attempts to 
+% determine the type of the new function, which shoudl reference    bool_od`
+
+\label{f}
+
+
+% [function] \tracerman_label_if:nNN (label, ifcode, elsecode)
+% @param label the name of a label
+% @param ifcode code that executes if label is defined
+% @param elsecode code that executes if label is not defined
+
+\cs_set:Npn \tracerman_label_if:nNN #1#2#3 {
+    % This is an extremely convoluted hack
+    %   to implement conditional execution, depending on whether a label
+    %   is already defined.
+    % Step 1: define local variables
+    \bool_new:N \l_tracerman_is_label_defined_bool
+    \str_new:N \l_tracerman_result_of_checking_if_label_is_defined
+    % Step 2: generate variant \str_set:Nx. This variant expands its second
+    %   argument recursively. This behaviour  is necessary, because
+    %   said "second argument" checks if a label is defined.
+    \cs_generate_variant:Nn \str_set:Nn {Nx}
+    
+
+    % Step 3: Assign the result, which can be either 'yes' or 'no', to a variable.
+    \str_set:Nx \l_tracerman_result_of_checking_if_label_is_defined {\is_label_defined{#1}}
+    % Step 4: Define a new variable whose value is 'yes'. This is necessary because
+    %   I believe there must be a better way to do it. As it stands, this is
+    %   what 10 hours of attempts get me.
+    \str_set:Nn \yes {yes}
+    % Step 5: Compare the value in \l_tracerman_result_of_checking_if_label_is_defined
+    %   against the value in 'yes'. Set the variable
+    %   \l_tracerman_is_label_defined_bool accordingly to the result.
+    \str_if_eq:NNTF \yes \l_tracerman_result_of_checking_if_label_is_defined {
+        \bool_set_true:N \l_tracerman_is_label_defined_bool
+    }{
+        \bool_set_false:N \l_tracerman_is_label_defined_bool
+    }
+
+    % Step 6: Finally, the boolean variable \l_tracerman_is_label_defined_bool
+    %   makes conditional execution poossible.
+    \bool_if:NTF {\l_tracerman_is_label_defined_bool} {#2} {#3}
+}
+
+\tracerman_label_if:nNN {what} {sdfds} {ddfffff}
+
+
+\ExplSyntaxOff
+
+
+
+
+% \ExplSyntaxOn
+
+
+
+% \ExplSyntaxOff
+
+
+
+
+% define \tracerman_write_label
+% \cs_set:Npn \tracerman_write_label:n #1 {
+%     #1
+% }
 % Functions:
 
 % register_item(name)
@@ -36,5 +146,6 @@
 % get_target_list_of(name1)
 %...
 
-\ExplSyntaxOff
+
+
 \end{document}
