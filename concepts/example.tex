@@ -26,16 +26,6 @@
     }
 \makeatother
 
-
-
-\cs_set:Npn \tracerman_write_label:n #1 {
-    #1\label{#1}
-}
-
-\cs_set:Npn \tracerman_ref_label:n #1 {
-    \hyperref[#1]{#1}
-}
-
 % \bool_if:NTF \l_tmpa_bool {WHAT} {
 %       WHAT
 % }
@@ -56,27 +46,21 @@
 % the command attempts to 
 % determine the type of the new function, which shoudl reference    bool_od`
 
-\label{f}
-
-
 % [function] \tracerman_label_if:nNN (label, ifcode, elsecode)
 % @param label the name of a label
 % @param ifcode code that executes if label is defined
 % @param elsecode code that executes if label is not defined
-
+\bool_new:N \l_tracerman_is_label_defined_bool
+\str_new:N \l_tracerman_result_of_checking_if_label_is_defined
 \cs_set:Npn \tracerman_label_if:nNN #1#2#3 {
-    % This is an extremely convoluted hack
+    % I use an extremely convoluted hack
     %   to implement conditional execution, depending on whether a label
     %   is already defined.
     % Step 1: define local variables
-    \bool_new:N \l_tracerman_is_label_defined_bool
-    \str_new:N \l_tracerman_result_of_checking_if_label_is_defined
     % Step 2: generate variant \str_set:Nx. This variant expands its second
     %   argument recursively. This behaviour  is necessary, because
     %   said "second argument" checks if a label is defined.
     \cs_generate_variant:Nn \str_set:Nn {Nx}
-    
-
     % Step 3: Assign the result, which can be either 'yes' or 'no', to a variable.
     \str_set:Nx \l_tracerman_result_of_checking_if_label_is_defined {\is_label_defined{#1}}
     % Step 4: Define a new variable whose value is 'yes'. This is necessary because
@@ -97,7 +81,22 @@
     \bool_if:NTF {\l_tracerman_is_label_defined_bool} {#2} {#3}
 }
 
-\tracerman_label_if:nNN {what} {sdfds} {ddfffff}
+\cs_set:Npn \tracerman_write_label:n #1 {
+    #1\label{#1}
+}
+
+\cs_set:Npn \tracerman_ref_label:n #1 {
+    \tracerman_label_if:nNN {#1} {
+        \hyperref[#1]{#1}
+    } {
+        \tracerman_error{Label~`#1'~is~referenced~but~not~defined.}
+    }
+}
+
+\tracerman_write_label:n {mylabel}\\
+
+\tracerman_ref_label:n {mylabel}\\
+\tracerman_ref_label:n {labelthatdoesnotexist}\\
 
 
 \ExplSyntaxOff
