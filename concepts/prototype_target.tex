@@ -1,0 +1,54 @@
+\documentclass{article}
+\usepackage{hyperref}
+\usepackage{color}
+\usepackage{ifthen}
+
+\title{Test}
+\author{Authorman}
+\date{today}
+\begin{document}
+
+% 
+
+\ExplSyntaxOn
+
+
+%     \prop_new:N \l_tracerman_traces_prop
+%     \prop_clear:N \l_tracerman_traces_prop
+%     \prop_put:Nnn \l_tracerman_traces_prop {A} {val}
+%     \prop_item:Nn \l_tracerman_traces_prop {A}
+
+\seq_new:N \l_tracerman_targets_seq
+\seq_put_right:Nn \l_tracerman_targets_seq {item0}
+\seq_put_right:Nn \l_tracerman_targets_seq {item1}
+\seq_put_right:Nn \l_tracerman_targets_seq {item2}
+\seq_put_right:Nn \l_tracerman_targets_seq {item3}
+
+% Hack: 
+
+
+
+\cs_set:Npn \tracerman_print_links_to_target:nn #1#2 {
+    % Hack: Generate a variant \int_set that recursively
+    %   expands the second argument.
+    \cs_generate_variant:Nn \int_set:Nn {Nx}
+    % Hack: Use it.
+
+    \int_new:N \l_tracerman_i_int
+    \int_new:N \l_tracerman_target_length_int
+
+    \int_set:Nn \l_tracerman_i_int 1
+    \int_set:Nx {\l_tracerman_target_length_int} {\seq_count:N{#2}}
+    \int_incr:N \l_tracerman_target_length_int
+    
+    \int_do_while:nNnn {\l_tracerman_i_int} < {\l_tracerman_target_length_int} {
+        #1~$\rightarrow$~\seq_item:Nn #2 \l_tracerman_i_int\\
+        \int_incr:N \l_tracerman_i_int
+    }
+}
+
+\tracerman_print_links_to_target:nn A \l_tracerman_targets_seq
+
+\ExplSyntaxOff
+
+\end{document}
