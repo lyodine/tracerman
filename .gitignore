@@ -1,5 +1,6 @@
 *.aux
 *.fdb_latexmk
 *.fls
+*.out
 concepts/*.log
 concepts/*.synctex.gz
