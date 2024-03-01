@@ -2,6 +2,7 @@
 \usepackage{hyperref}
 \usepackage{color}
 \usepackage{ifthen}
+\usepackage[pdf]{graphviz}
 
 \title{Test}
 \author{Authorman}
@@ -9,6 +10,10 @@
 \begin{document}
 
 % 
+% \digraph{abc}{
+%     rankdir=LR;
+%     a -> b -> c;
+%  }
 
 \ExplSyntaxOn
 
@@ -19,15 +24,73 @@
 %     \prop_item:Nn \l_tracerman_traces_prop {A}
 
 \seq_new:N \l_tracerman_targets_seq
-\seq_put_right:Nn \l_tracerman_targets_seq {item0}
+
+
+\seq_put_right:Nn \l_tracerman_targets_seq {sds}
 \seq_put_right:Nn \l_tracerman_targets_seq {item1}
-\seq_put_right:Nn \l_tracerman_targets_seq {item2}
-\seq_put_right:Nn \l_tracerman_targets_seq {item3}
-
-% Hack: 
+\seq_put_right:Nn \l_tracerman_targets_seq {B}
+\seq_put_right:Nn \l_tracerman_targets_seq {s}
 
 
+default
 
+% Declare a dictionary of type
+%   label : set[label]
+% where for each label, the dictionary contains a sequence of targets.
+\prop_new:N \l_tracerman_source_target_prop
+% If the sour
+
+% @ Temporary variable that holds an empty list
+\clist_new:N \l_tracerman_init_targets_clist
+% @var Temporary variable.
+\clist_new:N \l_tracerman_update_targets_clist
+
+    % Update the clist
+    % \clist_put_right:Nn \l_tracerman_init_targets_clist {msg1}
+    % \clist_put_right:Nn \l_tracerman_init_targets_clist {msg2}
+    % Add the clist to the property list
+
+\cs_set:Npn \tracerman_update_link_dictionary:nn #1#2 {
+    % <Conditional>:
+    % If no target list exists for label #1,
+    %   then enter an empty target list for label #1.
+    \prop_put_if_new:NnV \l_tracerman_source_target_prop {#1} \l_tracerman_init_targets_clist
+    \prop_show:N \l_tracerman_source_target_prop
+    % From the link dictionary, extract the target list for label #1,
+    %   then assign that value in \l_tracerman_update_targets_clist
+    \cs_generate_variant:Nn \clist_set:Nn {Nx}
+    \clist_set:Nx \l_tracerman_update_targets_clist
+        {\prop_item:Nn \l_tracerman_source_target_prop {#1}}
+    % Update the target list with a new target.
+    \clist_put_right:Nn \l_tracerman_update_targets_clist {#2}
+    % Enter the updated target list for label #1.
+    %   Note: clists are accessed and modified by value.
+    \prop_put:NnV \l_tracerman_source_target_prop {#1} {\l_tracerman_update_targets_clist}
+    
+}
+
+\tracerman_update_link_dictionary:nn {A} {B}
+\tracerman_update_link_dictionary:nn {A} {C}
+\tracerman_update_link_dictionary:nn {M} {K}
+\tracerman_update_link_dictionary:nn {Ues} {M}
+\tracerman_update_link_dictionary:nn {M} {O}
+
+\prop_log:N \l_tracerman_source_target_prop
+
+
+
+    % \clist_put_right:Nn \l_tracerman_temp_targets_update_me_clist {what}
+    
+    % Print:
+    % \prop_item:Nn \l_tracerman_source_target_prop A
+    % endprint
+    
+    
+% \prop_log:N \l_tracerman_source_target_prop
+
+
+% @param #1 source Source label of the links
+% @param #2 target_seq Sequence of target labels of the links
 \cs_set:Npn \tracerman_print_links_to_target:nn #1#2 {
     % Hack: Generate a variant \int_set that recursively
     %   expands the second argument.
@@ -37,18 +100,37 @@
     \int_new:N \l_tracerman_i_int
     \int_new:N \l_tracerman_target_length_int
 
+    % [Iterate through #2(target_seq). For each item e, 
+    %   print a link of form #1->e]
+    % To do so, declare two variables:
+    %   - \l_tracerman_i_int The index variable
+    %   - \l_tracerman_target_length_int The "upper bound"
+    % This is somehow more cumbersome than iterating an C array.
     \int_set:Nn \l_tracerman_i_int 1
-    \int_set:Nx {\l_tracerman_target_length_int} {\seq_count:N{#2}}
+    \int_set:Nx {\l_tracerman_target_length_int} {\clist_count:N{#2}}
     \int_incr:N \l_tracerman_target_length_int
-    
     \int_do_while:nNnn {\l_tracerman_i_int} < {\l_tracerman_target_length_int} {
-        #1~$\rightarrow$~\seq_item:Nn #2 \l_tracerman_i_int\\
+        #1~$\rightarrow$~\clist_item:Nn #2 \l_tracerman_i_int\\
         \int_incr:N \l_tracerman_i_int
     }
 }
 
-\tracerman_print_links_to_target:nn A \l_tracerman_targets_seq
+
+\clist_new:N \newlist
+\clist_put_right:Nn \newlist 1
+\clist_put_right:Nn \newlist 2
+\clist_put_right:Nn \newlist 3
+\tracerman_print_links_to_target:nn A \newlist
+ 
+
+% \tracerman_print_links_to_target:nn A \l_tracerman_targets_seq
 
 \ExplSyntaxOff
 
 \end{document}
+
+% a condition in the middle - answered
+
+% algorithms that filter out noise
+
+% threats to validity: convergence, maturity, etc. - answered
